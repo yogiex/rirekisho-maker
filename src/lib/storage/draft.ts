@@ -1,90 +1,65 @@
-import { rirekishoSchema, type RirekishoFormData } from '@/lib/schema/rirekisho-schema';
-import { DRAFT_VERSION, type RirekishoData } from '@/types/rirekisho';
+import { z } from 'zod';
+import { DRAFT_VERSION, rirekishoSchema, type RirekishoData } from '@/lib/schema/rirekisho-schema';
 
-export interface DraftPayload {
-  version: number;
-  savedAt: string;
-  data: RirekishoFormData;
-}
-
-const STORAGE_KEY = 'rirekisho-draft';
+const DRAFT_KEY = 'rirekisho-draft';
 const BACKUP_KEY = 'rirekisho-draft-backup';
 
-export function loadDraft(): DraftPayload | null {
-  if (typeof window === 'undefined') return null;
+const envelopeSchema = z.object({
+  version: z.number(),
+  savedAt: z.string(),
+  data: rirekishoSchema,
+});
+
+export interface LoadedDraft {
+  data: RirekishoData;
+  savedAt: string;
+}
+
+export function isStorageAvailable(): boolean {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    localStorage.setItem('__rk_probe', '1');
+    localStorage.removeItem('__rk_probe');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Invalid or version-mismatched drafts are backed up, never silently destroyed. */
+export function loadDraft(): LoadedDraft | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as DraftPayload;
-    if (parsed.version !== DRAFT_VERSION) {
+    const result = envelopeSchema.safeParse(JSON.parse(raw));
+    if (!result.success || result.data.version !== DRAFT_VERSION) {
       localStorage.setItem(BACKUP_KEY, raw);
-      localStorage.removeItem(STORAGE_KEY);
       return null;
     }
-    const result = rirekishoSchema.safeParse(parsed.data);
-    if (!result.success) {
-      localStorage.setItem(BACKUP_KEY, raw);
-      localStorage.removeItem(STORAGE_KEY);
-      return null;
-    }
-    return { ...parsed, data: result.data };
+    return { data: result.data.data, savedAt: result.data.savedAt };
   } catch {
     return null;
   }
 }
 
-let saveTimeout: ReturnType<typeof setTimeout> | null = null;
+export type SaveError = 'QUOTA_EXCEEDED';
 
-export function saveDraftDebounced(data: RirekishoFormData, callback?: () => void): void {
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => {
-    try {
-      saveDraft(data);
-      callback?.();
-    } catch {
-      // quota exceeded or other error
-    }
-  }, 800);
-}
-
-export function saveDraft(data: RirekishoFormData): void {
-  if (typeof window === 'undefined') return;
+export function saveDraft(data: RirekishoData): void | SaveError {
   try {
-    const payload: DraftPayload = {
-      version: DRAFT_VERSION,
-      savedAt: new Date().toISOString(),
-      data,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  } catch (e) {
-    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-      throw new Error('QUOTA_EXCEEDED');
-    }
-    throw e;
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({ version: DRAFT_VERSION, savedAt: new Date().toISOString(), data }),
+    );
+  } catch {
+    return 'QUOTA_EXCEEDED';
   }
 }
 
-export function clearDraft(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(BACKUP_KEY);
-}
-
-export function exportDraft(data: RirekishoData): Blob {
-  const payload = {
-    version: DRAFT_VERSION,
-    exportedAt: new Date().toISOString(),
-    data,
-  };
-  return new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-}
-
-export async function importDraft(file: File): Promise<RirekishoFormData> {
-  const text = await file.text();
-  const parsed = JSON.parse(text);
-  const result = rirekishoSchema.safeParse(parsed.data);
-  if (!result.success) {
-    throw new Error(`Invalid data: ${result.error.issues.map(i => i.message).join(', ')}`);
+/** SEC-07: remove every trace of app data. */
+export function clearAllDraftData(): void {
+  const keys: string[] = [];
+  for (let i = 0; i < localStorage.length; i += 1) {
+    const key = localStorage.key(i);
+    if (key?.startsWith('rirekisho-')) keys.push(key);
   }
-  return result.data;
+  keys.forEach((key) => localStorage.removeItem(key));
 }

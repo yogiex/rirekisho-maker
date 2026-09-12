@@ -1,10 +1,10 @@
-import type { RirekishoData } from '@/types/rirekisho';
+import type { RirekishoData } from '@/lib/schema/rirekisho-schema';
 
 export const SAMPLE_DRAFT: RirekishoData = {
-  fillDate: { year: 2025, month: 6 },
+  fillDate: { year: 2025, month: 6, day: 15 },
   furigana: 'サントソ・ブディ',
   fullName: 'ブディ サントソ',
-  dateOfBirth: { year: 1995, month: 3 },
+  dateOfBirth: { year: 1995, month: 3, day: 15 },
   gender: 'male',
   postalCode: '150-0001',
   prefecture: '東京都',
@@ -14,12 +14,12 @@ export const SAMPLE_DRAFT: RirekishoData = {
   email: 'budi.santoso@example.com',
   alternateContactEnabled: false,
   history: [
-    { id: 'h1', date: { year: 2010, month: 4 }, category: 'education', name: '東京都立xx高等学校', nameFurigana: 'とうきょうとりつxxこうとうがっこう', action: '入学' },
-    { id: 'h2', date: { year: 2013, month: 3 }, category: 'education', name: '東京都立xx高等学校', action: '卒業', detail: '普通科' },
+    { id: 'h1', date: { year: 2010, month: 4 }, category: 'education', name: '東京都立xx高等学校', nameFurigana: 'とうきょうとりつxxこうとうがっこう', action: '入学', detail: '' },
+    { id: 'h2', date: { year: 2013, month: 3 }, category: 'education', name: '東京都立xx高等学校', nameFurigana: '', action: '卒業', detail: '普通科' },
     { id: 'h3', date: { year: 2013, month: 4 }, category: 'education', name: 'xx大学', nameFurigana: 'xxだいがく', action: '入学', detail: '文学部 国際文化交流学科' },
-    { id: 'h4', date: { year: 2017, month: 3 }, category: 'education', name: 'xx大学', action: '卒業' },
+    { id: 'h4', date: { year: 2017, month: 3 }, category: 'education', name: 'xx大学', nameFurigana: '', action: '卒業', detail: '' },
     { id: 'h5', date: { year: 2017, month: 4 }, category: 'work', name: '株式会社xx', nameFurigana: 'かぶしきがいしゃxx', action: '入社', detail: '営業部' },
-    { id: 'h6', date: { year: 2020, month: 6 }, category: 'work', name: '株式会社xx', action: '異動', detail: '海外営業部' },
+    { id: 'h6', date: { year: 2020, month: 6 }, category: 'work', name: '株式会社xx', nameFurigana: '', action: '異動', detail: '海外営業部' },
   ],
   historyCurrent: true,
   licenses: [

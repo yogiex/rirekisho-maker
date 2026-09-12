@@ -1,17 +1,7 @@
-'use client';
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { strings } from '@/lib/constants/strings';
-
 export function Step2History() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">{strings.step2Title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground">Coming soon...</p>
-      </CardContent>
-    </Card>
+    <div className="py-8 text-center text-sm text-muted-foreground">
+      <p>学歴・職歴 — Coming in M2</p>
+    </div>
   );
 }

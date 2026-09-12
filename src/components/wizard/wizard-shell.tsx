@@ -1,136 +1,111 @@
-'use client';
-
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
-import { rirekishoSchema, getDefaultValues, type RirekishoFormData } from '@/lib/schema/rirekisho-schema';
-import type { Resolver } from 'react-hook-form';
-import { StepIndicator } from './step-indicator';
-import { WizardNav } from './wizard-nav';
-import { Step1BasicInfo } from './steps/step1-basic-info';
-import { Step2History } from './steps/step2-history';
-import { Step3Licenses } from './steps/step3-licenses';
-import { Step4Preferences } from './steps/step4-preferences';
-import { Step5Preview } from './steps/step5-preview';
-import { loadDraft, saveDraftDebounced, clearDraft } from '@/lib/storage/draft';
+import { Check, Lock } from 'lucide-react';
+import { Step1BasicInfo } from '@/components/wizard/steps/step1-basic-info';
+import { WizardErrorBoundary } from '@/components/wizard/wizard-error-boundary';
+import { WizardNav } from '@/components/wizard/wizard-nav';
+import { DraftFormContext } from '@/components/wizard/draft-form-context';
+import { useDraftAutosave } from '@/components/wizard/hooks/use-draft-autosave';
+import { strings } from '@/lib/constants/strings';
+import { loadDraft } from '@/lib/storage/draft';
+import { createDefaultDraft, rirekishoSchema, stepSchemas, type RirekishoData } from '@/lib/schema/rirekisho-schema';
+import { focusFirstError } from '@/lib/utils/form';
 
-const STEP_FIELDS: (keyof RirekishoFormData)[][] = [
-  ['furigana', 'fullName', 'dateOfBirth', 'postalCode', 'prefecture', 'address'],
-  ['history'],
-  ['licenses'],
-  ['motivation', 'requests'],
-  [],
-];
+const TOTAL_STEPS = strings.steps.length;
 
 export function WizardShell() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([0]));
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [step, setStep] = useState(1);
 
-  const form = useForm<RirekishoFormData>({
-    resolver: zodResolver(rirekishoSchema) as Resolver<RirekishoFormData>,
-    defaultValues: getDefaultValues(),
+  const form = useForm<RirekishoData>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(rirekishoSchema) as any,
+    mode: 'onBlur',
+    defaultValues: useMemo(() => createDefaultDraft(new Date()), []),
   });
-
-  const { watch, formState: { errors }, setValue, reset } = form;
 
   useEffect(() => {
     const draft = loadDraft();
-    if (draft) {
-      reset(draft.data);
-      toast.info('下書きが復元されました');
+    const defaultData = createDefaultDraft(new Date());
+    form.reset(draft?.data ?? defaultData);
+    // Use requestAnimationFrame to defer setState to avoid cascading renders
+    const id = requestAnimationFrame(() => setIsReady(true));
+    return () => cancelAnimationFrame(id);
+  }, [form]);
+
+  const savedLabel = useDraftAutosave(form, isReady);
+  const stepMeta = strings.steps[step - 1];
+
+  function handleNext(): void {
+    const values = form.getValues();
+    const schema = stepSchemas[step as keyof typeof stepSchemas];
+    if (schema) {
+      const result = schema.safeParse(values);
+      if (!result.success) {
+        focusFirstError(result.error as { issues: { path: (string | number)[] }[] });
+        return;
+      }
     }
-  }, [reset]);
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+    window.scrollTo({ top: 0 });
+  }
 
-  useEffect(() => {
-    const subscription = watch((data) => {
-      setIsSaving(true);
-      saveDraftDebounced(data as RirekishoFormData, () => {
-        setIsSaving(false);
-        setLastSaved(new Date());
-      });
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  const goToNext = useCallback(async () => {
-    const fields = STEP_FIELDS[currentStep];
-    if (fields.length > 0) {
-      const isValid = await form.trigger(fields);
-      if (!isValid) return;
-    }
-    const next = Math.min(currentStep + 1, 4);
-    setCurrentStep(next);
-    setVisitedSteps(prev => new Set([...prev, next]));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentStep, form]);
-
-  const goToPrev = useCallback(() => {
-    const prev = Math.max(currentStep - 1, 0);
-    setCurrentStep(prev);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentStep]);
-
-  const goToStep = useCallback((step: number) => {
-    if (visitedSteps.has(step)) {
-      setCurrentStep(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }, [visitedSteps]);
-
-  const handleReset = useCallback(() => {
-    clearDraft();
-    reset(getDefaultValues());
-    setCurrentStep(0);
-    setVisitedSteps(new Set([0]));
-    setLastSaved(null);
-    toast.success('リセットしました');
-  }, [reset]);
-
-  const handleLoadSample = useCallback(async () => {
-    const { SAMPLE_DRAFT } = await import('@/lib/constants/sample-draft');
-    reset(SAMPLE_DRAFT);
-    toast.success('サンプルデータを読み込みました');
-  }, [reset]);
-
-  const stepErrors: Record<string, string> = {};
-  const fieldNames = STEP_FIELDS[currentStep];
-  fieldNames.forEach(field => {
-    const error = errors[field];
-    if (error) stepErrors[field] = error.message as string;
-  });
-
-  const renderStep = () => {
-    switch (currentStep) {
-      case 0: return <Step1BasicInfo data={form.watch()} errors={stepErrors} onUpdate={(field, value) => setValue(field, value as never)} />;
-      case 1: return <Step2History />;
-      case 2: return <Step3Licenses />;
-      case 3: return <Step4Preferences />;
-      case 4: return <Step5Preview data={form.watch()} onReset={handleReset} />;
-      default: return null;
-    }
-  };
+  function handleBack(): void {
+    setStep((s) => Math.max(s - 1, 1));
+    window.scrollTo({ top: 0 });
+  }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6 pb-20 md:pb-4">
-      <StepIndicator
-        currentStep={currentStep}
-        visitedSteps={visitedSteps}
-        onStepClick={goToStep}
-      />
-      <div className="py-4">
-        {renderStep()}
-      </div>
-      <WizardNav
-        onPrev={goToPrev}
-        onNext={currentStep === 4 ? () => {} : goToNext}
-        isFirst={currentStep === 0}
-        isLast={currentStep === 4}
-        isSaving={isSaving}
-        lastSaved={lastSaved}
-      />
-    </div>
+    <WizardErrorBoundary>
+      <DraftFormContext.Provider value={form}>
+        <div className="min-h-dvh bg-background">
+          <header className="border-b">
+            <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 md:px-6">
+              <h1 className="text-lg font-semibold tracking-tight">{strings.app.title}</h1>
+              {savedLabel && (
+                <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Check className="size-3 text-green-600" aria-hidden />
+                  {savedLabel}
+                </p>
+              )}
+            </div>
+          </header>
+
+          <main className="mx-auto max-w-4xl px-4 py-6 md:px-6 md:py-8">
+            {!isReady ? null : (
+              <>
+                <div className="mb-6">
+                  <p className="text-xs text-muted-foreground">
+                    {step}/{TOTAL_STEPS}
+                  </p>
+                  <h2 tabIndex={-1} className="text-2xl font-semibold">
+                    {stepMeta.jp}
+                    <span className="ml-2 text-sm font-normal text-muted-foreground">{stepMeta.id}</span>
+                  </h2>
+                </div>
+
+                {step === 1 && <Step1BasicInfo onNext={handleNext} />}
+                {step > 1 && (
+                  <p className="text-sm text-muted-foreground">{strings.misc.stepPlaceholder(step)}</p>
+                )}
+
+                <WizardNav
+                  onPrev={handleBack}
+                  onNext={handleNext}
+                  isFirst={step === 1}
+                  isLast={step === TOTAL_STEPS}
+                />
+
+                <p className="mt-10 flex items-start gap-1.5 text-xs text-muted-foreground">
+                  <Lock className="mt-0.5 size-3 shrink-0" aria-hidden />
+                  {strings.trust.privacyFooter}
+                </p>
+              </>
+            )}
+          </main>
+        </div>
+      </DraftFormContext.Provider>
+    </WizardErrorBoundary>
   );
 }

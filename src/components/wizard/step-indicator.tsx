@@ -1,16 +1,8 @@
-'use client';
-
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { strings } from '@/lib/constants/strings';
 
-const STEPS = [
-  { key: 'basic', label: strings.step1Title },
-  { key: 'history', label: strings.step2Title },
-  { key: 'licenses', label: strings.step3Title },
-  { key: 'preferences', label: strings.step4Title },
-  { key: 'preview', label: strings.step5Title },
-];
+const STEPS = strings.steps.map((s) => ({ key: s.jp, label: s.jp }));
 
 interface StepIndicatorProps {
   currentStep: number;

@@ -1,92 +1,105 @@
-'use client';
-
-import { useState, useRef } from 'react';
-import { Card } from '@/components/ui/card';
+import { useRef, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Camera, Trash2, Loader2 } from 'lucide-react';
-import { processPhoto } from '@/lib/utils/photo';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FieldTip } from '@/components/wizard/field-tip';
 import { strings } from '@/lib/constants/strings';
+import { processPhotoFile, type PhotoErrorReason } from '@/lib/utils/photo';
 
-interface PhotoUploadProps {
-  value?: string;
-  onChange: (value: string | undefined) => void;
-}
+type PhotoUiState =
+  | { status: 'idle' }
+  | { status: 'processing' }
+  | { status: 'error'; reason: PhotoErrorReason };
 
-export function PhotoUpload({ value, onChange }: PhotoUploadProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+const ERROR_TOAST: Record<PhotoErrorReason, string> = {
+  NOT_IMAGE: strings.photo.errorNotImage,
+  TOO_LARGE: strings.photo.errorTooLarge,
+  PROCESSING_FAILED: strings.photo.errorFailed,
+};
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+export function PhotoUpload() {
+  const form = useFormContext();
+  const photo = form.watch('photo');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [ui, setUi] = useState<PhotoUiState>({ status: 'idle' });
+
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
     if (!file) return;
+    setUi({ status: 'processing' });
+    const result = await processPhotoFile(file);
+    if (result.ok) {
+      form.setValue('photo', result.dataUrl, { shouldValidate: true, shouldDirty: true });
+      setUi({ status: 'idle' });
+    } else {
+      setUi({ status: 'error', reason: result.reason });
+      toast.error(ERROR_TOAST[result.reason]);
+    }
+  }
 
-    if (!file.type.startsWith('image/')) {
-      alert(strings.photoInvalidType);
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      alert(strings.photoMaxSize);
-      return;
-    }
+  function handleRemove(): void {
+    form.setValue('photo', undefined, { shouldValidate: true, shouldDirty: true });
+    setUi({ status: 'idle' });
+  }
 
-    setIsProcessing(true);
-    try {
-      const dataUrl = await processPhoto(file);
-      onChange(dataUrl);
-    } catch {
-      alert('写真の処理に失敗しました');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const processing = ui.status === 'processing';
 
   return (
-    <Card className="p-4">
-      <div className="aspect-[3/4] relative overflow-hidden rounded-md border border-dashed border-border bg-muted/50">
-        {value ? (
-          <img src={value} alt="証明写真" className="w-full h-full object-cover" />
-        ) : (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            <Camera className="h-10 w-10 mb-2" />
-            <span className="text-xs">{strings.photoPlaceholder}</span>
-          </div>
-        )}
-        {isProcessing && (
-          <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            <span className="ml-2 text-xs">{strings.photoProcessing}</span>
-          </div>
-        )}
-      </div>
-      <div className="flex gap-2 mt-3">
-        <Button
+    <Card className={processing ? 'opacity-60' : undefined}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-1.5 text-base">
+          {strings.step1.photoHeading}
+          <FieldTip text={strings.tips.photo} />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <button
           type="button"
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isProcessing}
+          onClick={() => inputRef.current?.click()}
+          disabled={processing}
+          aria-label={strings.step1.photoHeading}
+          className="relative grid aspect-3/4 w-full max-w-45 place-items-center overflow-hidden rounded-md border border-dashed bg-stone-100"
         >
-          {strings.photoChange}
-        </Button>
-        {value && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onChange(undefined)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          {photo ? (
+            <img src={photo} alt="Foto profil" className="h-full w-full object-cover" />
+          ) : (
+            <span className="text-sm text-muted-foreground">
+              {strings.photo.placeholder}
+              <span className="mt-1 block text-xs">{strings.photo.hint}</span>
+            </span>
+          )}
+          {processing && (
+            <span className="absolute inset-0 grid place-items-center bg-background/70">
+              <span className="flex items-center gap-2 text-xs">
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                {strings.photo.processing}
+              </span>
+            </span>
+          )}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleChange}
+          className="hidden"
+          aria-hidden
+          tabIndex={-1}
+        />
+        {photo && (
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
+              {strings.photo.change}
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={handleRemove}>
+              {strings.photo.remove}
+            </Button>
+          </div>
         )}
-      </div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileSelect}
-      />
+      </CardContent>
     </Card>
   );
 }
