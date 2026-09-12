@@ -9,7 +9,7 @@ import type { RirekishoData } from '@/lib/schema/rirekisho-schema';
 
 interface RowDateSelectProps {
   name: FieldPath<RirekishoData>;
-  unit: 'year' | 'month';
+  unit: 'year' | 'month' | 'day';
   label: string;
   options: readonly number[];
 }
@@ -33,7 +33,7 @@ export function RowDateSelect({ name, unit, label, options }: RowDateSelectProps
             <SelectContent className="max-h-64">
               {options.map((n) => (
                 <SelectItem key={n} value={String(n)} className="tabular-nums">
-                  {unit === 'year' ? `${n}` : `${n}月`}
+                  {unit === 'year' ? n : unit === 'month' ? `${n}月` : `${n}日`}
                 </SelectItem>
               ))}
             </SelectContent>

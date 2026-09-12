@@ -22,6 +22,7 @@ export function RirekishoPaper({ data }: { data: RirekishoData }) {
       id="rirekisho-paper"
       style={{
         ...paperText,
+        fontFamily: 'var(--font-paper)',
         width: PAPER_WIDTH_PX,
         minHeight: PAPER_HEIGHT_PX,
         background: PAPER_BG,

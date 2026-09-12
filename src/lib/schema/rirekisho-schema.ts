@@ -21,7 +21,7 @@ export type HistoryAction =
 export const DRAFT_VERSION = 1;
 
 // ---------- regexes ----------
-const FURIGANA_RE = /^[\u3040-\u309Fー]+$/;
+const FURIGANA_RE = /^[\u3040-\u309Fー・]+$/;
 const POSTAL_RE = /^\d{3}-?\d{4}$/;
 const PHONE_RE = /^0\d{1,4}-?\d{1,4}-?\d{3,4}$/;
 const E = strings.errors;

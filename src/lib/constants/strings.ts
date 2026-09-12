@@ -206,5 +206,20 @@ export const strings = {
     importInvalid: 'File tidak valid — gunakan file JSON hasil export aplikasi ini.',
     importVersion: 'Versi file tidak didukung.',
     importInvalidFields: 'Isi file tidak lengkap atau tidak valid.',
+    fillYear: '作成日·年',
+    fillMonth: '·月',
+    fillDay: '·日',
+  },
+
+  sample: {
+    ctaTitle: 'Belum tahu mulai dari mana?',
+    ctaDesc: 'Muat contoh data lengkap untuk melihat hasil akhirnya, lalu ganti dengan datamu.',
+    ctaButton: 'Coba dengan contoh',
+    sidebarButton: 'Contoh data',
+    confirmTitle: 'Ganti isi form dengan contoh?',
+    confirmDesc: 'Data yang sudah kamu isi akan diganti dengan data contoh. Tindakan ini tidak bisa dibatalkan.',
+    confirmCancel: 'Batal',
+    confirmOk: 'Ya, muat contoh',
+    loaded: 'Contoh data dimuat — ganti dengan datamu sendiri, dan jangan lupa fotonya.',
   },
 } as const;

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
-import { saveDraft } from '@/lib/storage/draft';
+import { saveDraft, updateLastStep } from '@/lib/storage/draft';
 import { rirekishoSchema, type RirekishoData } from '@/lib/schema/rirekisho-schema';
 import { strings } from '@/lib/constants/strings';
 
@@ -12,8 +12,15 @@ const DEBOUNCE_MS = 800;
  * watch-fire (default values) can overwrite the stored draft. THE classic
  * data-loss bug this app must never ship (RULES §7).
  */
-export function useDraftAutosave(form: UseFormReturn<RirekishoData>, armed: boolean) {
+export function useDraftAutosave(form: UseFormReturn<RirekishoData>, armed: boolean, step: number) {
   const [savedLabel, setSavedLabel] = useState<string | null>(null);
+  const stepRef = useRef(step);
+
+  useEffect(() => {
+    stepRef.current = step;
+    if (!armed) return;
+    updateLastStep(step);
+  }, [step, armed]);
 
   useEffect(() => {
     if (!armed) return;
@@ -24,7 +31,7 @@ export function useDraftAutosave(form: UseFormReturn<RirekishoData>, armed: bool
       timer = setTimeout(() => {
         const result = rirekishoSchema.safeParse(values);
         if (!result.success) return;
-        const err = saveDraft(result.data);
+        const err = saveDraft(result.data, stepRef.current);
         if (err === 'QUOTA_EXCEEDED') {
           toast.error(strings.photo.errorFailed);
           return;

@@ -8,11 +8,13 @@ export const envelopeSchema = z.object({
   version: z.number(),
   savedAt: z.string(),
   data: rirekishoSchema,
+  lastStep: z.number().int().min(1).max(5).optional(),
 });
 
 export interface LoadedDraft {
   data: RirekishoData;
   savedAt: string;
+  lastStep: number;
 }
 
 export function isStorageAvailable(): boolean {
@@ -35,7 +37,11 @@ export function loadDraft(): LoadedDraft | null {
       localStorage.setItem(BACKUP_KEY, raw);
       return null;
     }
-    return { data: result.data.data, savedAt: result.data.savedAt };
+    return {
+      data: result.data.data,
+      savedAt: result.data.savedAt,
+      lastStep: result.data.lastStep ?? 1,
+    };
   } catch {
     return null;
   }
@@ -43,14 +49,26 @@ export function loadDraft(): LoadedDraft | null {
 
 export type SaveError = 'QUOTA_EXCEEDED';
 
-export function saveDraft(data: RirekishoData): void | SaveError {
+export function saveDraft(data: RirekishoData, lastStep: number): void | SaveError {
   try {
     localStorage.setItem(
       DRAFT_KEY,
-      JSON.stringify({ version: DRAFT_VERSION, savedAt: new Date().toISOString(), data }),
+      JSON.stringify({ version: DRAFT_VERSION, savedAt: new Date().toISOString(), data, lastStep }),
     );
   } catch {
     return 'QUOTA_EXCEEDED';
+  }
+}
+
+export function updateLastStep(lastStep: number): void {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const parsed = envelopeSchema.safeParse(JSON.parse(raw));
+    if (!parsed.success) return;
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...parsed.data, lastStep }));
+  } catch {
+    return;
   }
 }
 

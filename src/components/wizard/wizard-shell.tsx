@@ -10,6 +10,7 @@ import { Step3Licenses } from "@/components/wizard/steps/step3-licenses";
 import { Step4Preferences } from "@/components/wizard/steps/step4-preferences";
 import { Step5Preview } from "@/components/wizard/steps/step5-preview";
 import { WizardNav } from "@/components/wizard/wizard-nav";
+import { StepIndicator } from "@/components/wizard/step-indicator";
 import { WizardErrorBoundary } from "@/components/wizard/wizard-error-boundary";
 import { DraftFormContext } from "@/components/wizard/draft-form-context";
 import { useDraftAutosave } from "@/components/wizard/hooks/use-draft-autosave";
@@ -24,9 +25,12 @@ import {
 
 const TOTAL_STEPS = strings.steps.length;
 
+const clampStep = (n: number): number => Math.min(Math.max(n, 1), TOTAL_STEPS);
+
 export function WizardShell() {
   const [isReady, setIsReady] = useState(false);
   const [step, setStep] = useState(1);
+  const [maxReached, setMaxReached] = useState(1);
 
   const form = useForm<RirekishoData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,12 +42,20 @@ export function WizardShell() {
   useEffect(() => {
     const draft = loadDraft();
     form.reset(draft?.data ?? createDefaultDraft(new Date()));
-    const id = requestAnimationFrame(() => setIsReady(true));
+    const id = requestAnimationFrame(() => {
+      if (draft) {
+        const s = clampStep(draft.lastStep);
+        setStep(s);
+        setMaxReached(s);
+      }
+      setIsReady(true);
+    });
     return () => cancelAnimationFrame(id);
   }, [form]);
 
-  const savedLabel = useDraftAutosave(form, isReady);
+  const savedLabel = useDraftAutosave(form, isReady, step);
   const stepMeta = strings.steps[step - 1];
+  const isPreview = step === TOTAL_STEPS;
 
   async function handleNext(): Promise<void> {
     const rawFields = stepFields[step as keyof typeof stepFields] ?? [];
@@ -52,7 +64,21 @@ export function WizardShell() {
       { shouldFocus: true },
     );
     if (!valid || step >= TOTAL_STEPS) return;
-    setStep((s) => s + 1);
+    const next = clampStep(step + 1);
+    setStep(next);
+    setMaxReached((m) => Math.max(m, next));
+    window.scrollTo({ top: 0 });
+  }
+
+  function handleSelect(target: number): void {
+    if (target > maxReached) return;
+    setStep(clampStep(target));
+    window.scrollTo({ top: 0 });
+  }
+
+  function handleRestart(): void {
+    setStep(1);
+    setMaxReached(1);
     window.scrollTo({ top: 0 });
   }
 
@@ -67,7 +93,9 @@ export function WizardShell() {
         <FormProvider {...form}>
           <div className="min-h-dvh bg-background">
             <header className="border-b">
-              <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3 md:px-6">
+              <div
+                className={`mx-auto flex ${isPreview ? "max-w-6xl" : "max-w-4xl"} items-center justify-between px-4 py-3 md:px-6`}
+              >
                 <h1 className="text-lg font-semibold tracking-tight">
                   {strings.app.title}
                 </h1>
@@ -80,13 +108,17 @@ export function WizardShell() {
               </div>
             </header>
 
-            <main className="mx-auto max-w-4xl px-4 pb-28 pt-6 md:px-6 md:pb-8 md:pt-8">
+            <main
+              className={`mx-auto ${isPreview ? "max-w-6xl" : "max-w-4xl"} px-4 pb-28 pt-6 md:px-6 md:pb-8 md:pt-8`}
+            >
               {!isReady ? null : (
                 <>
                   <div className="mb-6">
-                    <p className="text-xs text-muted-foreground">
-                      {step}/{TOTAL_STEPS}
-                    </p>
+                    <StepIndicator
+                      current={step}
+                      maxReached={maxReached}
+                      onSelect={handleSelect}
+                    />
                     <h2 tabIndex={-1} className="text-2xl font-semibold">
                       {stepMeta.jp}
                       <span className="ml-2 text-sm font-normal text-muted-foreground">
@@ -99,7 +131,7 @@ export function WizardShell() {
                   {step === 2 && <Step2History onNext={handleNext} />}
                   {step === 3 && <Step3Licenses onNext={handleNext} />}
                   {step === 4 && <Step4Preferences onNext={handleNext} />}
-                  {step === 5 && <Step5Preview onRestart={() => setStep(1)} />}
+                  {step === 5 && <Step5Preview onRestart={handleRestart} />}
 
                   <p className="mt-10 flex items-start gap-1.5 text-xs text-muted-foreground">
                     <Lock className="mt-0.5 size-3 shrink-0" aria-hidden />

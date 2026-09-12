@@ -13,7 +13,10 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PaperScaler } from '@/components/preview/paper-scaler';
 import { RirekishoPaper } from '@/components/preview/rirekisho-paper';
+import { RowDateSelect } from '@/components/wizard/row-date-select';
+import { SampleDataButton } from '@/components/wizard/sample-data-button';
 import { useDraftForm } from '@/components/wizard/hooks/use-draft-form';
+import { DAY_OPTIONS, MONTH_OPTIONS, YEAR_OPTIONS } from '@/lib/constants/date-options';
 import { strings } from '@/lib/constants/strings';
 import { createDefaultDraft } from '@/lib/schema/rirekisho-schema';
 import { clearAllDraftData, exportDraftToJson } from '@/lib/storage/draft';
@@ -89,6 +92,12 @@ export function Step5Preview({ onRestart }: Step5Props) {
       </div>
 
       <Card className="h-fit space-y-4 p-4 lg:sticky lg:top-24">
+        <div className="grid grid-cols-3 gap-2">
+          <RowDateSelect name="fillDate.year" unit="year" label={strings.step5.fillYear} options={YEAR_OPTIONS} />
+          <RowDateSelect name="fillDate.month" unit="month" label={strings.step5.fillMonth} options={MONTH_OPTIONS} />
+          <RowDateSelect name="fillDate.day" unit="day" label={strings.step5.fillDay} options={DAY_OPTIONS} />
+        </div>
+
         <div className="space-y-2">
           <Button type="button" className="w-full" onClick={handlePrint}>
             <Printer className="size-4" aria-hidden />
@@ -125,6 +134,9 @@ export function Step5Preview({ onRestart }: Step5Props) {
             className="hidden"
             onChange={handleImportChange}
           />
+          <div className="flex">
+            <SampleDataButton variant="outline" />
+          </div>
         </div>
 
         <Separator />

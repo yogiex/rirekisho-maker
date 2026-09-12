@@ -7,6 +7,7 @@ import { Form, FormMessage } from '@/components/ui/form';
 import { Card, CardContent } from '@/components/ui/card';
 import { Info } from 'lucide-react';
 import { PhotoUpload } from '@/components/wizard/photo-upload';
+import { SampleDataButton } from '@/components/wizard/sample-data-button';
 
 import { FormFieldDeep, SelectFieldFree } from '@/components/wizard/form-primitives';
 import { useDraftForm } from '@/components/wizard/hooks/use-draft-form';
@@ -17,6 +18,7 @@ import { GENDER_VALUES, type Gender } from '@/lib/schema/rirekisho-schema';
 import { formatPostal, normalizeWidth } from '@/lib/utils/normalize';
 import { getWareki } from '@/lib/utils/wareki';
 import { getFullAge } from '@/lib/utils/age';
+import { isDraftEmpty } from '@/lib/utils/draft-state';
 import { Controller } from 'react-hook-form';
 
 const GENDER_LABEL: Record<Gender, string> = {
@@ -35,6 +37,7 @@ export function Step1BasicInfo({ onNext }: Step1Props) {
   const altEnabled = form.watch('alternateContactEnabled');
   const wareki = getWareki(dob);
   const age = getFullAge(dob, new Date());
+  const isEmpty = isDraftEmpty(form.watch());
 
   return (
     <Form {...form}>
@@ -51,6 +54,18 @@ export function Step1BasicInfo({ onNext }: Step1Props) {
           </div>
 
           <div className="space-y-6 md:col-span-2">
+            {isEmpty && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{strings.sample.ctaTitle}</p>
+                    <p className="text-xs text-muted-foreground">{strings.sample.ctaDesc}</p>
+                  </div>
+                  <SampleDataButton />
+                </CardContent>
+              </Card>
+            )}
+
             <Card>
               <CardContent className="flex items-start gap-2 p-3 text-xs text-muted-foreground">
                 <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />

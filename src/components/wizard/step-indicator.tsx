@@ -1,76 +1,84 @@
 import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { strings } from '@/lib/constants/strings';
 
-const STEPS = strings.steps.map((s) => ({ key: s.jp, label: s.jp }));
+import { Progress } from '@/components/ui/progress';
+import { strings } from '@/lib/constants/strings';
+import { cn } from '@/lib/utils';
 
 interface StepIndicatorProps {
-  currentStep: number;
-  visitedSteps: Set<number>;
-  onStepClick: (step: number) => void;
+  current: number;
+  maxReached: number;
+  onSelect: (step: number) => void;
 }
 
-export function StepIndicator({ currentStep, visitedSteps, onStepClick }: StepIndicatorProps) {
+export function StepIndicator({ current, maxReached, onSelect }: StepIndicatorProps) {
+  const total = strings.steps.length;
+  const currentMeta = strings.steps[current - 1];
+
   return (
-    <nav aria-label="Progress" className="py-4">
-      <ol className="hidden md:flex items-center">
-        {STEPS.map((step, i) => {
-          const isCompleted = visitedSteps.has(i) && i < currentStep;
-          const isCurrent = i === currentStep;
-          const isClickable = visitedSteps.has(i);
+    <>
+      <ol className="mb-8 hidden items-start md:flex" aria-label="Langkah wizard">
+        {strings.steps.map((meta, i) => {
+          const n = i + 1;
+          const isDone = n < current;
+          const isCurrent = n === current;
+          const isReachable = n <= maxReached && !isCurrent;
+
+          const nodeClass = cn(
+            'flex size-8 items-center justify-center rounded-full border-2 text-xs font-medium transition-colors',
+            isDone && 'border-primary bg-primary text-primary-foreground',
+            isCurrent && 'border-primary bg-background text-primary',
+            !isDone && !isCurrent && 'border-transparent bg-muted text-muted-foreground',
+            isReachable && 'hover:border-primary/50',
+          );
+          const content = isDone ? <Check className="size-4" aria-hidden /> : n;
 
           return (
-            <li key={step.key} className="flex items-center flex-1">
-              <button
-                type="button"
-                onClick={() => isClickable && onStepClick(i)}
-                disabled={!isClickable}
-                className={cn(
-                  'flex items-center gap-2 group',
-                  isClickable ? 'cursor-pointer' : 'cursor-not-allowed'
+            <li key={meta.jp} className={cn('flex items-start', n < total && 'flex-1')}>
+              <div className="flex flex-col items-center gap-1">
+                {isReachable ? (
+                  <button
+                    type="button"
+                    onClick={() => onSelect(n)}
+                    className={nodeClass}
+                    aria-label={meta.jp}
+                  >
+                    {content}
+                  </button>
+                ) : (
+                  <div
+                    className={nodeClass}
+                    aria-disabled={!isCurrent || undefined}
+                    aria-current={isCurrent ? 'step' : undefined}
+                  >
+                    {content}
+                  </div>
                 )}
-              >
                 <span
                   className={cn(
-                    'flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium transition-colors',
-                    isCompleted && 'bg-primary text-primary-foreground',
-                    isCurrent && 'border-2 border-primary text-primary bg-background',
-                    !isCompleted && !isCurrent && 'bg-muted text-muted-foreground'
+                    'whitespace-nowrap text-xs',
+                    isCurrent ? 'font-medium text-foreground' : 'text-muted-foreground',
                   )}
                 >
-                  {isCompleted ? <Check className="h-4 w-4" /> : i + 1}
+                  {meta.jp}
                 </span>
-                <span className={cn(
-                  'text-xs font-medium',
-                  isCurrent ? 'text-foreground' : 'text-muted-foreground'
-                )}>
-                  {step.label}
-                </span>
-              </button>
-              {i < STEPS.length - 1 && (
-                <div className={cn(
-                  'flex-1 h-px mx-3',
-                  isCompleted ? 'bg-primary' : 'bg-border'
-                )} />
+              </div>
+              {n < total && (
+                <span
+                  aria-hidden
+                  className={cn('mx-1 mb-5 mt-4 h-px flex-1', isDone ? 'bg-primary' : 'bg-border')}
+                />
               )}
             </li>
           );
         })}
       </ol>
 
-      <div className="md:hidden">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium">
-            {currentStep + 1}/{STEPS.length} · {STEPS[currentStep].label}
-          </span>
-        </div>
-        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
-          />
-        </div>
+      <div className="mb-6 space-y-2 md:hidden">
+        <p className="text-sm font-medium">
+          {current}/{total} · {currentMeta?.jp}
+        </p>
+        <Progress value={(current / total) * 100} className="h-1.5" />
       </div>
-    </nav>
+    </>
   );
 }
