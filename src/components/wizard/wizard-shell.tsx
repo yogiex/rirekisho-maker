@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { FieldPath } from 'react-hook-form';
 import { Check, Lock } from 'lucide-react';
+
 import { Step1BasicInfo } from '@/components/wizard/steps/step1-basic-info';
-import { WizardErrorBoundary } from '@/components/wizard/wizard-error-boundary';
+import { Step2History } from '@/components/wizard/steps/step2-history';
 import { WizardNav } from '@/components/wizard/wizard-nav';
+import { WizardErrorBoundary } from '@/components/wizard/wizard-error-boundary';
 import { DraftFormContext } from '@/components/wizard/draft-form-context';
 import { useDraftAutosave } from '@/components/wizard/hooks/use-draft-autosave';
 import { strings } from '@/lib/constants/strings';
 import { loadDraft } from '@/lib/storage/draft';
-import { createDefaultDraft, rirekishoSchema, stepSchemas, type RirekishoData } from '@/lib/schema/rirekisho-schema';
-import { focusFirstError } from '@/lib/utils/form';
+import { createDefaultDraft, rirekishoSchema, stepFields, type RirekishoData } from '@/lib/schema/rirekisho-schema';
 
 const TOTAL_STEPS = strings.steps.length;
 
@@ -27,9 +29,7 @@ export function WizardShell() {
 
   useEffect(() => {
     const draft = loadDraft();
-    const defaultData = createDefaultDraft(new Date());
-    form.reset(draft?.data ?? defaultData);
-    // Use requestAnimationFrame to defer setState to avoid cascading renders
+    form.reset(draft?.data ?? createDefaultDraft(new Date()));
     const id = requestAnimationFrame(() => setIsReady(true));
     return () => cancelAnimationFrame(id);
   }, [form]);
@@ -37,17 +37,11 @@ export function WizardShell() {
   const savedLabel = useDraftAutosave(form, isReady);
   const stepMeta = strings.steps[step - 1];
 
-  function handleNext(): void {
-    const values = form.getValues();
-    const schema = stepSchemas[step as keyof typeof stepSchemas];
-    if (schema) {
-      const result = schema.safeParse(values);
-      if (!result.success) {
-        focusFirstError(result.error as { issues: { path: (string | number)[] }[] });
-        return;
-      }
-    }
-    setStep((s) => Math.min(s + 1, TOTAL_STEPS));
+  async function handleNext(): Promise<void> {
+    const rawFields = stepFields[step as keyof typeof stepFields] ?? [];
+    const valid = await form.trigger(rawFields as unknown as FieldPath<RirekishoData>[], { shouldFocus: true });
+    if (!valid || step >= TOTAL_STEPS) return;
+    setStep((s) => s + 1);
     window.scrollTo({ top: 0 });
   }
 
@@ -72,7 +66,7 @@ export function WizardShell() {
             </div>
           </header>
 
-          <main className="mx-auto max-w-4xl px-4 py-6 md:px-6 md:py-8">
+          <main className="mx-auto max-w-4xl px-4 pb-28 pt-6 md:px-6 md:pb-8 md:pt-8">
             {!isReady ? null : (
               <>
                 <div className="mb-6">
@@ -86,21 +80,21 @@ export function WizardShell() {
                 </div>
 
                 {step === 1 && <Step1BasicInfo onNext={handleNext} />}
-                {step > 1 && (
+                {step === 2 && <Step2History onNext={handleNext} />}
+                {step > 2 && (
                   <p className="text-sm text-muted-foreground">{strings.misc.stepPlaceholder(step)}</p>
                 )}
-
-                <WizardNav
-                  onPrev={handleBack}
-                  onNext={handleNext}
-                  isFirst={step === 1}
-                  isLast={step === TOTAL_STEPS}
-                />
 
                 <p className="mt-10 flex items-start gap-1.5 text-xs text-muted-foreground">
                   <Lock className="mt-0.5 size-3 shrink-0" aria-hidden />
                   {strings.trust.privacyFooter}
                 </p>
+
+                {step < TOTAL_STEPS && (
+                  <div className="mt-8">
+                    <WizardNav showBack={step > 1} onBack={handleBack} onNext={handleNext} />
+                  </div>
+                )}
               </>
             )}
           </main>

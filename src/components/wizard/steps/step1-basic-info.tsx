@@ -12,16 +12,12 @@ import { FormFieldDeep, SelectFieldFree } from '@/components/wizard/form-primiti
 import { useDraftForm } from '@/components/wizard/hooks/use-draft-form';
 import { strings } from '@/lib/constants/strings';
 import { PREFECTURES } from '@/lib/constants/prefectures';
+import { DAY_OPTIONS, MONTH_OPTIONS, YEAR_OPTIONS } from '@/lib/constants/date-options';
 import { GENDER_VALUES, type Gender } from '@/lib/schema/rirekisho-schema';
 import { formatPostal, normalizeWidth } from '@/lib/utils/normalize';
 import { getWareki } from '@/lib/utils/wareki';
 import { getFullAge } from '@/lib/utils/age';
 import { Controller } from 'react-hook-form';
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_OPTIONS = Array.from({ length: CURRENT_YEAR - 1900 + 1 }, (_, i) => CURRENT_YEAR - i);
-const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAY_OPTIONS = Array.from({ length: 31 }, (_, i) => i + 1);
 
 const GENDER_LABEL: Record<Gender, string> = {
   male: strings.step1.genderMale,
@@ -272,15 +268,6 @@ export function Step1BasicInfo({ onNext }: Step1Props) {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="inline-flex h-10 items-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {strings.nav.next}
-          </button>
         </div>
       </form>
     </Form>

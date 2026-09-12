@@ -4,49 +4,34 @@ import { Button } from '@/components/ui/button';
 import { strings } from '@/lib/constants/strings';
 
 interface WizardNavProps {
-  onPrev: () => void;
+  showBack: boolean;
+  onBack: () => void;
   onNext: () => void;
-  isFirst: boolean;
-  isLast: boolean;
-  isSaving?: boolean;
-  lastSaved?: Date | null;
 }
 
-export function WizardNav({ onPrev, onNext, isFirst, isLast, isSaving, lastSaved }: WizardNavProps) {
+export function WizardNav({ showBack, onBack, onNext }: WizardNavProps) {
   return (
-    <>
-      <div className="hidden md:flex items-center justify-between py-4 border-t border-border">
-        <div className="text-xs text-muted-foreground">
-          {isSaving ? (
-            <span>保存中...</span>
-          ) : lastSaved ? (
-            <span>自動保存済み • {lastSaved.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</span>
-          ) : null}
-        </div>
-        <div className="flex gap-2">
-          {!isFirst && (
-            <Button variant="outline" onClick={onPrev}>
-              {strings.nav.back}
-            </Button>
-          )}
-          <Button onClick={onNext}>
-            {isLast ? strings.steps[4].jp : strings.nav.next}
-          </Button>
-        </div>
-      </div>
-
-      <div className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-background border-t border-border flex items-center px-4 gap-2 z-50">
-        {!isFirst ? (
-          <Button variant="outline" className="flex-1 h-11" onClick={onPrev}>
-            {strings.nav.back}
-          </Button>
-        ) : (
-          <div className="flex-1" />
-        )}
-        <Button className="flex-[2] h-11" onClick={onNext}>
-          {isLast ? strings.steps[4].jp : strings.nav.next}
+    <nav
+      aria-label={strings.nav.navAria}
+      className="fixed inset-x-0 bottom-0 z-10 flex gap-3 border-t bg-background p-4 md:static md:justify-end md:border-0 md:p-0"
+    >
+      {showBack && (
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 flex-1 md:h-10 md:flex-none md:px-8"
+          onClick={onBack}
+        >
+          {strings.nav.back}
         </Button>
-      </div>
-    </>
+      )}
+      <Button
+        type="button"
+        className="h-11 flex-[2] md:h-10 md:flex-none md:px-8"
+        onClick={onNext}
+      >
+        {strings.nav.next}
+      </Button>
+    </nav>
   );
 }

@@ -200,7 +200,7 @@ export function createDefaultDraft(today: Date): RirekishoData {
   };
 }
 
-// ---------- step gating schemas (RULES §8.1) ----------
+// ---------- step gating (RULES §8.1) ----------
 export const stepSchemas = {
   1: baseSchema
     .pick({
@@ -217,4 +217,16 @@ export const stepSchemas = {
     specialties: true, hobbies: true, motivation: true, commuteHours: true,
     commuteMinutes: true, spouse: true, dependents: true, requests: true,
   }),
+} as const;
+
+/** Field paths per step for `form.trigger()` (A-4). */
+export const stepFields = {
+  1: [
+    'photo', 'furigana', 'fullName', 'dateOfBirth.year', 'dateOfBirth.month', 'dateOfBirth.day',
+    'gender', 'postalCode', 'prefecture', 'address', 'addressFurigana', 'phone', 'email',
+    'alternateContact.relation', 'alternateContact.name', 'alternateContact.phone',
+  ],
+  2: ['history', 'historyCurrent'],
+  3: ['licenses'],
+  4: ['specialties', 'hobbies', 'motivation', 'commuteHours', 'commuteMinutes', 'spouse', 'dependents', 'requests'],
 } as const;
