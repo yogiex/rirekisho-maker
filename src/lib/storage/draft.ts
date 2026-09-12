@@ -4,7 +4,7 @@ import { DRAFT_VERSION, rirekishoSchema, type RirekishoData } from '@/lib/schema
 const DRAFT_KEY = 'rirekisho-draft';
 const BACKUP_KEY = 'rirekisho-draft-backup';
 
-const envelopeSchema = z.object({
+export const envelopeSchema = z.object({
   version: z.number(),
   savedAt: z.string(),
   data: rirekishoSchema,
@@ -52,6 +52,10 @@ export function saveDraft(data: RirekishoData): void | SaveError {
   } catch {
     return 'QUOTA_EXCEEDED';
   }
+}
+
+export function exportDraftToJson(data: RirekishoData): string {
+  return JSON.stringify({ version: DRAFT_VERSION, savedAt: new Date().toISOString(), data }, null, 2);
 }
 
 /** SEC-07: remove every trace of app data. */

@@ -8,6 +8,7 @@ import { Step1BasicInfo } from "@/components/wizard/steps/step1-basic-info";
 import { Step2History } from "@/components/wizard/steps/step2-history";
 import { Step3Licenses } from "@/components/wizard/steps/step3-licenses";
 import { Step4Preferences } from "@/components/wizard/steps/step4-preferences";
+import { Step5Preview } from "@/components/wizard/steps/step5-preview";
 import { WizardNav } from "@/components/wizard/wizard-nav";
 import { WizardErrorBoundary } from "@/components/wizard/wizard-error-boundary";
 import { DraftFormContext } from "@/components/wizard/draft-form-context";
@@ -98,11 +99,7 @@ export function WizardShell() {
                   {step === 2 && <Step2History onNext={handleNext} />}
                   {step === 3 && <Step3Licenses onNext={handleNext} />}
                   {step === 4 && <Step4Preferences onNext={handleNext} />}
-                  {step > 4 && (
-                    <p className="text-sm text-muted-foreground">
-                      {strings.misc.stepPlaceholder(step)}
-                    </p>
-                  )}
+                  {step === 5 && <Step5Preview onRestart={() => setStep(1)} />}
 
                   <p className="mt-10 flex items-start gap-1.5 text-xs text-muted-foreground">
                     <Lock className="mt-0.5 size-3 shrink-0" aria-hidden />

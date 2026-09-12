@@ -86,6 +86,9 @@ export function Step2History({ onNext }: Step2HistoryProps) {
               onRequestRemove={() => requestRemove(index)}
             />
           ))}
+          {fields.length > 18 && (
+            <p className="text-xs text-amber-600">{strings.step2.longHistoryHint}</p>
+          )}
           <AddButtons onAdd={handleAdd} />
         </div>
       )}

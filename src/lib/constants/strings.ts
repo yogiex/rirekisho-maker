@@ -39,6 +39,7 @@ export const strings = {
     historyCurrent: '現在学校・会社に在籍中（「現在に至る」行を追加）',
     chronologyWarning: (rows: string) =>
       `Baris ${rows} tidak berurutan secara waktu — periksa kembali. (Tidak menghalangi lanjut)`,
+    longHistoryHint: 'Lebih dari 18 baris — hasil cetak akan menjadi 2 halaman.',
   },
 
   step3: {
@@ -144,6 +145,12 @@ export const strings = {
     sharedComputer:
       'Draft tersimpan di browser ini. Setelah selesai, tekan tombol Reset di langkah terakhir agar data terhapus dari perangkat ini.',
     autosave: '自動保存済み',
+    exportPiiWarning: 'File berisi data pribadi tanpa enkripsi — simpan dan bagikan dengan hati-hati.',
+    resetTitle: 'Hapus semua data?',
+    resetDesc: 'Draft, foto, dan semua data akan dihapus permanen dari browser ini. Tindakan ini tidak bisa dibatalkan.',
+    resetCancel: 'Batal',
+    resetConfirm: 'Ya, hapus semua',
+    resetDone: 'Semua data telah dihapus',
   },
 
   errors: {
@@ -157,7 +164,47 @@ export const strings = {
     actionMismatch: 'Aksi tidak sesuai kategori',
   },
 
-  misc: {
-    stepPlaceholder: (n: number) => `Step ${n} — dibuat di milestone berikutnya`,
+  paperLabel: {
+    title: '履歴書',
+    furigana: 'ふりがな',
+    name: '氏名',
+    dob: '生年月日',
+    gender: '性別',
+    male: '男',
+    female: '女',
+    postal: '〒',
+    address: '現住所',
+    phone: '電話',
+    email: 'メール',
+    contact: '連絡先',
+    photo: '写真',
+    dateCol: '年　月',
+    historyCol: '学歴・職歴',
+    licNameCol: '免許・資格名',
+    issuerCol: '発行元',
+    none: 'なし',
+    current: '現在に至る',
+    end: '以上',
+    specialty: '特技',
+    hobby: '趣味',
+    commute: '通勤時間',
+    dependents: '扶養家族',
+    motivation: '志望動機',
+    requests: '本人希望記入欄',
+  },
+
+  step5: {
+    print: 'PDFとして保存 / 印刷',
+    printHint: 'Chrome推奨。印刷ダイアログで用紙A4・余白「なし」・「背景のグラフィック」にチェック。',
+    exportJson: 'JSON をダウンロード',
+    importJson: 'JSON をインポート',
+    importing: '読み込み中…',
+    reset: '全データをリセット',
+    exportDone: 'Draft tersimpan sebagai JSON.',
+    importDone: 'Draft berhasil dimuat.',
+    importTooLarge: 'File terlalu besar (maksimal 2MB).',
+    importInvalid: 'File tidak valid — gunakan file JSON hasil export aplikasi ini.',
+    importVersion: 'Versi file tidak didukung.',
+    importInvalidFields: 'Isi file tidak lengkap atau tidak valid.',
   },
 } as const;
