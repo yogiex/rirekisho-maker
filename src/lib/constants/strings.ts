@@ -151,6 +151,7 @@ export const strings = {
     resetCancel: 'Batal',
     resetConfirm: 'Ya, hapus semua',
     resetDone: 'Semua data telah dihapus',
+    guideLink: 'Baca panduan: Cara membuat rirekisho',
   },
 
   errors: {

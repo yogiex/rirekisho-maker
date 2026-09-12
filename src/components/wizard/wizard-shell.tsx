@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { FieldPath } from "react-hook-form";
@@ -136,6 +137,11 @@ export function WizardShell() {
                   <p className="mt-10 flex items-start gap-1.5 text-xs text-muted-foreground">
                     <Lock className="mt-0.5 size-3 shrink-0" aria-hidden />
                     {strings.trust.privacyFooter}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    <Link href="/panduan" className="underline underline-offset-2 hover:text-foreground">
+                      {strings.trust.guideLink}
+                    </Link>
                   </p>
 
                   {step < TOTAL_STEPS && (
