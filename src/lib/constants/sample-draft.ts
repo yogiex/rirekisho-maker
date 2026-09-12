@@ -1,0 +1,37 @@
+import type { RirekishoData } from '@/types/rirekisho';
+
+export const SAMPLE_DRAFT: RirekishoData = {
+  fillDate: { year: 2025, month: 6 },
+  furigana: 'サントソ・ブディ',
+  fullName: 'ブディ サントソ',
+  dateOfBirth: { year: 1995, month: 3 },
+  gender: 'male',
+  postalCode: '150-0001',
+  prefecture: '東京都',
+  address: '渋谷区神宮前1-2-3',
+  addressFurigana: 'しぶやくじんぐまえ',
+  phone: '090-1234-5678',
+  email: 'budi.santoso@example.com',
+  alternateContactEnabled: false,
+  history: [
+    { id: 'h1', date: { year: 2010, month: 4 }, category: 'education', name: '東京都立xx高等学校', nameFurigana: 'とうきょうとりつxxこうとうがっこう', action: '入学' },
+    { id: 'h2', date: { year: 2013, month: 3 }, category: 'education', name: '東京都立xx高等学校', action: '卒業', detail: '普通科' },
+    { id: 'h3', date: { year: 2013, month: 4 }, category: 'education', name: 'xx大学', nameFurigana: 'xxだいがく', action: '入学', detail: '文学部 国際文化交流学科' },
+    { id: 'h4', date: { year: 2017, month: 3 }, category: 'education', name: 'xx大学', action: '卒業' },
+    { id: 'h5', date: { year: 2017, month: 4 }, category: 'work', name: '株式会社xx', nameFurigana: 'かぶしきがいしゃxx', action: '入社', detail: '営業部' },
+    { id: 'h6', date: { year: 2020, month: 6 }, category: 'work', name: '株式会社xx', action: '異動', detail: '海外営業部' },
+  ],
+  historyCurrent: true,
+  licenses: [
+    { id: 'l1', date: { year: 2019, month: 8 }, name: 'JLPT N3', issuer: '日本国際交流基金' },
+    { id: 'l2', date: { year: 2021, month: 3 }, name: '普通運転免許', issuer: '警視庁' },
+  ],
+  specialties: '日本語会話、Excel',
+  hobbies: '写真撮影、旅行',
+  motivation: '御社の海外営業部門において、アジア圏でのビジネス展開に貢献したいと考え志望しました。前職では東南アジア地域での営業経験を積み、日本語能力（JLPT N3）と現地市場への理解を深めてきました。御社のグローバル戦略に携わり、実績を積み上げたいです。',
+  commuteHours: 1,
+  commuteMinutes: 30,
+  spouse: false,
+  dependents: 0,
+  requests: '',
+};
