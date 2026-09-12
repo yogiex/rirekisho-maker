@@ -80,6 +80,7 @@ export function Step4Preferences({ onNext }: Step4PreferencesProps) {
               <Textarea
                 {...field}
                 id="motivation"
+                className="max-w-3xl"
                 value={field.value ?? ''}
                 rows={8}
                 placeholder={strings.step4.motivationPlaceholder}
@@ -161,6 +162,7 @@ export function Step4Preferences({ onNext }: Step4PreferencesProps) {
               <Textarea
                 {...field}
                 id="requests"
+                className="max-w-3xl"
                 value={field.value ?? ''}
                 rows={4}
                 placeholder={strings.step4.requestsPlaceholder}

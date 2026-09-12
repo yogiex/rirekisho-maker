@@ -48,12 +48,12 @@ export function Step1BasicInfo({ onNext }: Step1Props) {
         }}
         className="space-y-6"
       >
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-[280px_1fr]">
           <div className="md:sticky md:top-24 md:self-start">
             <PhotoUpload />
           </div>
 
-          <div className="space-y-6 md:col-span-2">
+          <div className="space-y-6">
             {isEmpty && (
               <Card className="border-primary/20 bg-primary/5">
                 <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">

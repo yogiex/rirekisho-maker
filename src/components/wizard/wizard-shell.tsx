@@ -94,7 +94,7 @@ export function WizardShell() {
           <div className="min-h-dvh bg-background">
             <header className="border-b">
               <div
-                className={`mx-auto flex ${isPreview ? "max-w-6xl" : "max-w-4xl"} items-center justify-between px-4 py-3 md:px-6`}
+                className={`mx-auto flex ${isPreview ? "max-w-6xl" : "max-w-5xl"} items-center justify-between px-4 py-3 md:px-6`}
               >
                 <h1 className="text-lg font-semibold tracking-tight">
                   {strings.app.title}
@@ -109,7 +109,7 @@ export function WizardShell() {
             </header>
 
             <main
-              className={`mx-auto ${isPreview ? "max-w-6xl" : "max-w-4xl"} px-4 pb-28 pt-6 md:px-6 md:pb-8 md:pt-8`}
+              className={`mx-auto ${isPreview ? "max-w-6xl" : "max-w-5xl"} px-4 pb-28 pt-6 md:px-6 md:pb-8 md:pt-8`}
             >
               {!isReady ? null : (
                 <>

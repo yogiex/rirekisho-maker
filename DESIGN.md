@@ -194,7 +194,7 @@ Mobile (375px):
 │  px-4 (16px)        │
 │  ┌─────────────────┐│
 │  │   Content       ││
-│  │   max-w-4xl     ││
+│  │   max-w-5xl     ││
 │  └─────────────────┘│
 │  pb-20 (80px)       │ ← fixed bottom nav clearance
 └─────────────────────┘
@@ -204,11 +204,23 @@ Desktop (768px+):
 │     px-6 (24px)                  │
 │  ┌──────────────────────────────┐│
 │  │       Content                ││
-│  │       max-w-4xl mx-auto      ││
+│  │       max-w-5xl mx-auto      ││
 │  └──────────────────────────────┘│
 │  pb-4 (16px)                     │
 └──────────────────────────────────┘
 ```
+
+### Container widths (A-24)
+
+| Region | Token | Derivation |
+|---|---|---|
+| Container (form, Step 1–4) | `max-w-5xl` (1024px) | grid 2-kolom field ~325px, row 4-kolom ~235px |
+| Container (preview, Step 5) | `max-w-6xl` (1152px) | paper 794 + sidebar 280 + gap 24 + padding 48 = 1146 |
+| Reading measure | Textarea 志望動機/本人希望 `max-w-3xl` (768px, ≈55 字/baris) | wide chrome, constrained prose |
+| Step 1 grid | `md:grid-cols-[280px_1fr]` | foto fixed, fields fluid |
+
+Changelog: 4xl → 5xl (A-24). 896px menyisakan 512px/sisi di 1920px; 1024px adalah sweet spot — 6xl untuk form membuat select 350–400px (over-shoot). Jangan kembalikan ke 4xl.
+
 
 ### 4.3 Component Spacing Patterns
 
@@ -430,7 +442,7 @@ Sebelum setiap release, verifikasi:
 |---|---|---|
 | Mobile | 375px–767px | Single column, fixed bottom nav |
 | Tablet | 768px–1023px | Two column form, top nav |
-| Desktop | 1024px+ | Full layout, max-w-4xl centered |
+| Desktop | 1024px+ | Full layout, max-w-5xl centered (form), max-w-6xl (preview) |
 
 ### 8.1 Mobile (< 768px)
 
