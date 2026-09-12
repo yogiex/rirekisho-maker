@@ -24,6 +24,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /rirekisho-maker
       - name: Verify CSP present in build output
         run: grep -q "connect-src 'none'" out/index.html
       - run: touch out/.nojekyll
