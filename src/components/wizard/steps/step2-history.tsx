@@ -7,10 +7,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,6 +14,8 @@ import {
 } from '@/components/ui/select';
 
 import { FieldTip } from '@/components/wizard/field-tip';
+import { ConfirmDeleteDialog } from '@/components/wizard/confirm-delete-dialog';
+import { RowDateSelect } from '@/components/wizard/row-date-select';
 import { useDraftForm } from '@/components/wizard/hooks/use-draft-form';
 import { strings } from '@/lib/constants/strings';
 import { MONTH_OPTIONS, YEAR_OPTIONS } from '@/lib/constants/date-options';
@@ -108,23 +106,11 @@ export function Step2History({ onNext }: Step2HistoryProps) {
         )}
       />
 
-      <AlertDialog open={pendingDelete !== null} onOpenChange={(o) => { if (!o) setPendingDelete(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{strings.step2.deleteTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{strings.step2.deleteDesc}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{strings.step2.deleteCancel}</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={confirmRemove}
-            >
-              {strings.step2.deleteConfirm}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={pendingDelete !== null}
+        onOpenChange={(o) => { if (!o) setPendingDelete(null); }}
+        onConfirm={confirmRemove}
+      />
     </form>
   );
 }
@@ -149,8 +135,8 @@ function HistoryRow({ index, onRequestRemove }: HistoryRowProps) {
         </span>
 
         <div className="grid grid-cols-2 gap-3 pl-6 md:grid-cols-4">
-          <DateSelect index={index} unit="year" label={strings.step2.dateYear} options={YEAR_OPTIONS} />
-          <DateSelect index={index} unit="month" label={strings.step2.dateMonth} options={MONTH_OPTIONS} />
+          <RowDateSelect name={`history.${index}.date.year` as P} unit="year" label={strings.step2.dateYear} options={YEAR_OPTIONS} />
+          <RowDateSelect name={`history.${index}.date.month` as P} unit="month" label={strings.step2.dateMonth} options={MONTH_OPTIONS} />
 
           <Controller
             control={control}
@@ -264,52 +250,13 @@ function HistoryRow({ index, onRequestRemove }: HistoryRowProps) {
 
       <button
         type="button"
-        aria-label={strings.step2.deleteAria}
+        aria-label={strings.common.deleteAria}
         onClick={onRequestRemove}
         className="absolute right-2 top-2 inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Trash2 className="size-4" aria-hidden />
       </button>
     </Card>
-  );
-}
-
-interface DateSelectProps {
-  index: number;
-  unit: 'year' | 'month';
-  label: string;
-  options: number[];
-}
-
-function DateSelect({ index, unit, label, options }: DateSelectProps) {
-  const { control } = useFormContext<RirekishoData>();
-  const name = `history.${index}.date.${unit}` as P;
-
-  return (
-    <Controller
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-xs text-muted-foreground">{label}</FormLabel>
-          <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
-            <FormControl>
-              <SelectTrigger className="h-9">
-                <SelectValue />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent className="max-h-64">
-              {options.map((n) => (
-                <SelectItem key={n} value={String(n)} className="tabular-nums">
-                  {unit === 'year' ? `${n}` : `${n}月`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
   );
 }
 

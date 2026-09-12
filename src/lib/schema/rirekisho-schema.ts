@@ -2,6 +2,9 @@ import { z } from 'zod';
 import { strings } from '@/lib/constants/strings';
 import { normalizeWidth } from '@/lib/utils/normalize';
 
+export const MOTIVATION_MAX = 400;
+export const REQUESTS_MAX = 300;
+
 // ---------- literals (RULES §2: as const, no enums) ----------
 export const GENDER_VALUES = ['male', 'female', 'none'] as const;
 export type Gender = (typeof GENDER_VALUES)[number];
@@ -147,12 +150,12 @@ export function createRirekishoSchema(today: Date) {
 
     specialties: widthText(z.string().max(50)),
     hobbies: widthText(z.string().max(50)),
-    motivation: widthText(z.string().max(400)),
+    motivation: widthText(z.string().max(MOTIVATION_MAX)),
     commuteHours: z.number().int().min(0).max(3),
     commuteMinutes: z.number().int().min(0).max(59),
     spouse: z.boolean(),
     dependents: z.number().int().min(0).max(20),
-    requests: widthText(z.string().max(300)),
+    requests: widthText(z.string().max(REQUESTS_MAX)),
   });
 
   return { base, alternateContactSchema, historyEntrySchema, licenseEntrySchema, jpFullDateSchema };
