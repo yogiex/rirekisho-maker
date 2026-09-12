@@ -434,6 +434,20 @@ Sebelum setiap release, verifikasi:
 - Long text in motivation → wrap dengan benar
 - Tidak ada foto → gray placeholder box render
 
+### 7.5 Launch Asset Checklist (FR-18)
+
+Semua asset statis, background `#fafaf9`, teks `#1c1917`, tanpa foto/data pengguna:
+
+| Asset | Path | Ukuran | Dipakai untuk |
+|---|---|---|---|
+| OG image | `public/og-image.png` | 1200×630 | `og:image` / Twitter card (`SEO.ogImage`) |
+| App icon | `src/app/icon.png` | 512×512 | Favicon + `<link rel="icon">` via Next metadata routes |
+| GitHub social preview | `docs/assets/social-preview.png` | 1280×640 | Repo Settings → Social preview (upload manual) |
+
+- [ ] Ukuran piksel persis sesuai tabel
+- [ ] OG image memuat 履歴書 + headline "Buat CV Jepang Gratis"
+- [ ] Icon terbaca pada 16px dan 32px (kontras tinggi, rounded square)
+
 ---
 
 ## 8. Responsive Breakpoints

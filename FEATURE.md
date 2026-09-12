@@ -735,6 +735,16 @@ rirekisho-maker/
 | AC-63 | DevTools Network tab shows zero outbound requests across full flow | G-4 |
 | AC-64 | CSP `connect-src 'none'` present in production HTML | SEC-01 |
 
+### 7.13 SEO Foundation (FR-18)
+
+| AC# | Criterion | PRD Ref |
+|---|---|---|
+| AC-65 | `<link rel="canonical">` in production HTML resolves to an absolute URL that includes the basePath (`/rirekisho-maker/`) | FR-18 |
+| AC-66 | `og:image` resolves to `https://yogiex.github.io/rirekisho-maker/og-image.png` (1200×630) | FR-18 |
+| AC-67 | `out/sitemap.xml` and `out/robots.txt` exist after static export; sitemap lists `/`, `/panduan`, `/panduan/cara-membuat-rirekisho` | FR-18 |
+| AC-68 | JSON-LD `WebApplication` + `FAQPage` (6 questions from `strings.faq`) present in `out/index.html` and parse as valid JSON; rendered only via `src/components/seo/json-ld.tsx` | FR-18, SEC-05-E |
+| AC-69 | JSON-LD `HowTo` intentionally NOT emitted (deprecated rich result; wizard is client-only) | D-15 |
+
 ---
 
 ## 8. Definition of Done per Feature

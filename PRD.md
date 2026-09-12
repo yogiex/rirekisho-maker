@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Product** | Rirekisho Maker — free, private-by-design Japanese resume builder |
-| **Version** | 1.1 (MVP, consolidated) |
+| **Version** | 1.2 (MVP, consolidated + SEO foundation) |
 | **Status** | Locked for build |
 | **Owner** | @yogiex |
 | **Repo** | `rirekisho-maker` → `https://yogiex.github.io/rirekisho-maker/` |
@@ -161,6 +161,7 @@ DevTools-empty-Network-tab proof (privacy kept).
 | FR-15 | Drag-reorder history | P2 | FEATURE F-13 |
 | FR-16 | Multiple profiles | P2 | FEATURE F-14 |
 | FR-17 | Full data reset (storage + object URLs) behind confirmation | **P0** | SEC-07 |
+| FR-18 | SEO technical foundation: metadata/canonical/OG/sitemap/robots/JSON-LD; GSC HTML-file verification | **P0** | FEATURE §7.13, SEC-05-E |
 
 ### 7.2 Non-Functional Requirements
 
@@ -313,6 +314,7 @@ analytics) or adopt a documented, disclosed exception (D-3 revisit trigger).
 | D-12 | Stack: Next.js static export · shadcn/ui · RHF+Zod · pnpm · Vitest | Locked in pre-dev checklist; no new deps without PR justification |
 | D-13 | Field tips = P0 | Core differentiator, not polish |
 | D-14 | Sample-data mode = P0 | Demo, test fixture, QA matrix input — triple duty |
+| D-15 | Google Search Console (verifikasi file HTML) = satu-satunya sumber data trafik; tanpa JS analitik client | Konsisten D-3 + CSP `connect-src 'none'` |
 
 Revisit triggers: user feedback channels (§10), competitor moves, guideline changes, Next.js CSP capabilities change.
 
@@ -326,6 +328,7 @@ Revisit triggers: user feedback channels (§10), competitor moves, guideline cha
 | Q-2 | Does sample persona include a 2-page history case (QA fixture)? | M4 |
 | Q-3 | License note for template layout reference beyond MIT? | Launch |
 | Q-4 | Which communities seed launch (Line/Discord/Facebook groups)? | Launch week |
+| Q-5 | Fase mana untuk artikel panduan JA (外国人 履歴書 書き方)? | Post-launch |
 
 ---
 
@@ -362,6 +365,11 @@ Revisit triggers: user feedback channels (§10), competitor moves, guideline cha
 ---
 
 ## Changelog
+
+**v1.2 (SEO foundation)**
+- FR-18 added (P0): metadata/canonical/OG/sitemap/robots/JSON-LD + GSC HTML-file verification; traceability FEATURE §7.13, SEC-05-E
+- D-15 added: GSC as sole traffic data source, no client-side analytics JS
+- Q-5 added: phase for Japanese-language guide article (外国人 履歴書 書き方)
 
 **v1.1 (consolidated)**
 - Privacy upgraded from *claimed* → *verifiable*: G-4, FR-12, US-07 rewritten around CSP `connect-src 'none'` + DevTools audit

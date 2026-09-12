@@ -26,8 +26,14 @@ jobs:
       - run: pnpm build
         env:
           NEXT_PUBLIC_BASE_PATH: /rirekisho-maker
-      - name: Verify CSP present in build output
-        run: grep -q "connect-src 'none'" out/index.html
+      - name: Verify SEO + CSP artifacts
+        run: |
+          test -f out/sitemap.xml
+          test -f out/robots.txt
+          grep -q 'rel="canonical"' out/index.html
+          grep -q 'application/ld+json' out/index.html
+          grep -q "connect-src 'none'" out/index.html
+          test -f out/og-image.png
       - run: touch out/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

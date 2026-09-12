@@ -11,7 +11,7 @@ data 100% tersimpan di perangkatmu.**
 ![Chrome-first printing](https://img.shields.io/badge/print-Chrome_first-4285F4)
 
 **[🚀 Coba sekarang (Live Demo)](https://yogiex.github.io/rirekisho-maker/)** ·
-[✨ Fitur](#-fitur) · [🔒 Privasi](#-privasi--keamanan) · [🛠️ Development](#️-development)
+[✨ Fitur](#-fitur) · [📖 Panduan](#-panduan) · [🔒 Privasi](#-privasi--keamanan) · [🛠️ Development](#️-development)
 
 *English below · Bahasa: 🇮🇩 | 🇬🇧 *(segera)* | 🇯🇵 *(segera)*
 
@@ -108,17 +108,39 @@ Privasi bukan sekadar janji di halaman — dipaksa secara teknis:
 Safari/Firefox tetap berfungsi, tapi dengan sedikit perbedaan margin — sesuaikan
 di dialog cetak.
 
+## 📖 Panduan
+
+Panduan lengkap cara membuat rirekisho dalam Bahasa Indonesia (struktur kolom,
+konvensi 和暦, tips untuk warga asing) tersedia di situs:
+
+- **[Panduan](https://yogiex.github.io/rirekisho-maker/panduan/)** — indeks panduan
+- **[Cara membuat rirekisho](https://yogiex.github.io/rirekisho-maker/panduan/cara-membuat-rirekisho/)** — langkah demi langkah
+
 ## ❓ FAQ
 
-**Gratis?** Ya, selamanya. Open source MIT, tanpa akun, tanpa watermark.
+**Apakah Rirekisho Maker gratis?** Ya, selamanya. Open source MIT — tanpa akun,
+tanpa watermark, tanpa batas unduhan.
+
+**Apakah data saya aman?** Data tidak pernah dikirim ke server mana pun —
+tersimpan hanya di browser Anda. Buktikan sendiri: buka DevTools → tab Network,
+isi form, dan lihat tidak ada request keluar. Batasannya: tersimpan tanpa
+enkripsi di browser — lihat bagian [Privasi](#-privasi--keamanan).
 
 **Apakah formatnya resmi?** Mengikuti konvensi umum 履歴書 gaya JIS (revisi
-panduan 2019). Bukan formulir resmi pemerintah — sebagian perusahaan punya
-format ketentuan sendiri, jadi konfirmasi ke perekrut bila ragu.
+panduan 2019). Bukan formulir resmi pemerintah — sebagian perusahaan memiliki
+format ketentuan sendiri, konfirmasikan ke perekrut bila ragu.
 
-**Datanya aman?** Tidak pernah dikirim ke mana pun (verifiable via DevTools).
-Batasannya: tersimpan tanpa enkripsi di browser — lihat bagian
-[Privasi](#-privasi--keamanan).
+**Bisakah dipakai dari ponsel?** Bisa. Draft tersimpan otomatis di browser —
+tutup dan lanjutkan kapan saja, termasuk pindah perangkat via file JSON.
+
+**Bagaimana cara export PDF?** Klik 印刷 di langkah terakhir, pilih "Save as
+PDF". Gunakan Chrome, kertas A4, margin "None", dan centang "Background
+graphics" agar garis tabel tercetak.
+
+**Saya warga asing, apakah cara mengisinya berbeda?** Ada beberapa konvensi
+khusus — furigana dalam hiragana, nama sesuai paspor, titik mulai riwayat —
+setiap kolom penting punya tips ⓘ di dalam aplikasi. Gunakan fitur "Coba dengan
+contoh" untuk melihat hasil akhirnya.
 
 **Bisa untuk 職務経歴書?** Belum — ada di [roadmap](#-roadmap).
 
@@ -157,6 +179,21 @@ pnpm lint           # termasuk aturan render-discipline (SEC-05)
   (jangan edit manual `components/ui/`).
 - Deploy otomatis ke `gh-pages` setiap push ke `main` (lihat
   `.github/workflows/deploy.yml`).
+
+</details>
+
+<details>
+<summary>🔎 Untuk maintainer: Google Search Console (GSC)</summary>
+
+Satu-satunya sumber data trafik (PRD D-15) — tanpa JS analitik client, agar CSP
+`connect-src 'none'` tetap utuh.
+
+- [ ] GSC → Add property (URL prefix) `https://yogiex.github.io/rirekisho-maker/`
+- [ ] Pilih verifikasi **HTML file** → simpan `google*.html` ke `public/`
+      (ikut ter-copy ke `out/` saat build) → push → klik Verify
+- [ ] Sitemaps → submit `https://yogiex.github.io/rirekisho-maker/sitemap.xml`
+- [ ] Bing Webmaster Tools → **Import from GSC** (tanpa verifikasi ulang)
+- [ ] Cek URL Inspection untuk `/`, `/panduan/`, `/panduan/cara-membuat-rirekisho/`
 
 </details>
 

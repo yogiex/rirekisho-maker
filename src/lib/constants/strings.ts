@@ -154,6 +154,43 @@ export const strings = {
     guideLink: 'Baca panduan: Cara membuat rirekisho',
   },
 
+  faq: [
+    {
+      question: 'Apakah Rirekisho Maker gratis?',
+      answer: 'Ya, selamanya. Open source MIT — tanpa akun, tanpa watermark, tanpa batas unduhan.',
+    },
+    {
+      question: 'Apakah data saya aman?',
+      answer:
+        'Data tidak pernah dikirim ke server mana pun — tersimpan hanya di browser Anda. Buktikan sendiri: buka DevTools → tab Network, isi form, dan lihat tidak ada request keluar.',
+    },
+    {
+      question: 'Apakah formatnya resmi?',
+      answer:
+        'Mengikuti konvensi umum 履歴書 gaya JIS (revisi panduan 2019). Bukan formulir resmi pemerintah — sebagian perusahaan memiliki format ketentuan sendiri, konfirmasikan ke perekrut bila ragu.',
+    },
+    {
+      question: 'Bisakah dipakai dari ponsel?',
+      answer:
+        'Bisa. Draft tersimpan otomatis di browser — tutup dan lanjutkan kapan saja, termasuk pindah perangkat via file JSON.',
+    },
+    {
+      question: 'Bagaimana cara export PDF?',
+      answer:
+        'Klik 印刷 di langkah terakhir, pilih "Save as PDF". Gunakan Chrome, kertas A4, margin "None", dan centang "Background graphics" agar garis tabel tercetak.',
+    },
+    {
+      question: 'Saya warga asing, apakah cara mengisinya berbeda?',
+      answer:
+        'Ada beberapa konvensi khusus — furigana dalam hiragana, nama sesuai paspor, titik mulai riwayat — setiap kolom penting punya tips ⓘ di dalam aplikasi. Gunakan fitur "Coba dengan contoh" untuk melihat hasil akhirnya.',
+    },
+  ],
+
+  seo: {
+    jsonLdAppName: 'Rirekisho Maker',
+    jsonLdAppDesc: 'Free Japanese resume (rirekisho) builder — private, no sign-up.',
+  },
+
   errors: {
     required: 'Wajib diisi',
     furigana: 'Gunakan hiragana (あ), bukan katakana/alfabet',

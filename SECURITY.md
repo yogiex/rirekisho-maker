@@ -124,8 +124,8 @@ File Upload → JSON.parse() → rirekishoSchema.safeParse() → Accept/Reject
 **Mekanisme pertahanan:**
 1. **React auto-escaping:** Semua JSX children dan properti string di-escape
    secara otomatis. Karakter `<`, `>`, `&`, `"`, `'` dikonversi ke HTML entities.
-2. **Tidak ada `dangerouslySetInnerHTML`:** Pencarian codebase menunjukkan nol
-   penggunaan `dangerouslySetInnerHTML` atau `__html` di seluruh src/.
+2. **Tidak ada `dangerouslySetInnerHTML` pada data user:** Satu-satunya penggunaan
+   ada di `src/components/seo/json-ld.tsx` untuk JSON-LD statis build-time (lihat SEC-05-E).
 3. **Tidak ada `document.write()` atau `innerHTML` assignment:** Pencarian menunjukkan
    nol penggunaan langsung ke DOM.
 4. **Tidak ada `eval()` atau `Function()`:** Tidak ada dynamic code execution.
@@ -158,6 +158,10 @@ File Upload → JSON.parse() → rirekishoSchema.safeParse() → Accept/Reject
 - ESLint rule `no-eval` (via eslint-config-next) menangkap `eval()` usage
 - Code review wajib untuk setiap PR yang menambahkan akses DOM langsung
 - Security regression tests memverifikasi tidak ada pattern berbahaya
+
+**Eksepsi SEC-05-E (JSON-LD):** `dangerouslySetInnerHTML` diizinkan HANYA di
+`src/components/seo/json-ld.tsx` untuk payload `JSON.stringify` dari objek
+literal build-time (tanpa input user). Setiap penggunaan lain tetap dilarang.
 
 ---
 
@@ -375,7 +379,7 @@ dijamin:
 | **Vector** | User input yang mengandung JavaScript code |
 | **Attack** | Penyerang menyisipkan `<script>alert(1)</script>` ke field form |
 | **Impact** | Dapat membaca localStorage, mencuri data, melakukan aksi atas nama user |
-| **Mitigation** | React auto-escaping + tidak ada dangerouslySetInnerHTML + CSP |
+| **Mitigation** | React auto-escaping + dangerouslySetInnerHTML hanya untuk JSON-LD statis (SEC-05-E) + CSP |
 | **Residual Risk** | Rendah — multiple layers of defense |
 | **Verification** | Security regression test + ESLint rules |
 
@@ -447,7 +451,7 @@ dijamin:
 **2. Lint Rules (ESLint)**
 - `no-eval` — menangkap `eval()` usage
 - TypeScript strict mode — type safety mencegah type coercion bugs
-- No dangerouslySetInnerHTML — ESLint rule yang memblokir JSX berbahaya
+- No dangerouslySetInnerHTML kecuali `json-ld.tsx` (SEC-05-E, payload statis)
 
 **3. Security Regression Tests**
 - Prototype pollution payloads (JSON import)
